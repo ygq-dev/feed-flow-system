@@ -1,0 +1,108 @@
+# ============================================================
+# 敏感配置均通过环境变量注入（见 README「快速启动」）
+# 本地开发请在 IDEA Run Configuration 的 Environment variables 中设置：
+# MYSQL_PASSWORD / REDIS_PASSWORD / RABBITMQ_USERNAME / RABBITMQ_PASSWORD
+# ============================================================
+spring:
+  application:
+    name: feedly
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/feedly?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true
+    username: ${MYSQL_USERNAME:root}
+    password: ${MYSQL_PASSWORD:change_me}
+    druid:
+      # 初始连接数
+      initialSize: 20
+      # 最小连接池数量
+      minIdle: 30
+      # 最大连接池数量
+      maxActive: 300
+      # 配置获取连接等待超时的时间
+      maxWait: 500
+      # 配置连接超时时间
+      connectTimeout: 3000
+      # 配置网络超时时间
+      socketTimeout: 3000
+      # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+      timeBetweenEvictionRunsMillis: 30000
+      # 配置一个连接在池中最小生存的时间，单位是毫秒
+      minEvictableIdleTimeMillis: 300000
+      # 配置一个连接在池中最大生存的时间，单位是毫秒
+      maxEvictableIdleTimeMillis: 900000
+      # 配置检测连接是否有效
+      validationQuery: SELECT 1
+      testWhileIdle: true
+      testOnBorrow: false
+      testOnReturn: false
+      stat-view-servlet:
+        enabled: true
+        login-username: ${DRUID_USERNAME:admin}
+        login-password: ${DRUID_PASSWORD:admin}
+      web-stat-filter:
+        enabled: true
+      filter:
+        stat:
+          enabled: true
+          slow-sql-millis: 1000  # 慢SQL阈值(ms)
+          log-slow-sql: true
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: ${REDIS_PASSWORD:}
+      timeout: 500ms
+      lettuce:
+        pool:
+          max-active: 50
+          max-idle: 20
+          min-idle: 5
+          max-wait: 500ms
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: ${RABBITMQ_USERNAME:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+    publisher-confirm-type: correlated
+    publisher-returns: true
+    listener:
+      simple:
+        acknowledge-mode: manual
+        retry:
+          enabled: true
+          max-attempts: 3
+          initial-interval: 1000
+          multiplier: 2
+
+mybatis-plus:
+  type-aliases-package: com.ygq.feedly.entity
+  configuration:
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+    cache-enabled: false
+    lazy-loading-enabled: false
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      id-type: none
+
+server:
+  port: 8089
+  shutdown: graceful
+
+logging:
+  level:
+    com.ygq.feedly: error
+    org.springframework: error
+
+feedly:
+  feed:
+    max-inbox-size: 2000
+    batch-size: 1000
+    bigv-threshold: 1000
+
+snowflake:
+  worker-id: 1
+  datacenter-id: 1
