@@ -8,7 +8,7 @@
 
 ## 架构总览
 
-![feed-architecture](C:\Users\20781\Desktop\feedly\docs\images\feed-architecture.png)
+![Feed流系统架构图](docs/images/feed-architecture.png)
 
 系统分三条路径：
 
@@ -60,7 +60,7 @@ Redis 不可用时熔断器开路，请求直接走 DB 兜底，**避免同步�
 
 | 分类 | 组件 |
 |---|---|
-| 框架 | Spring Boot、MyBatis |
+| 框架 | Spring Boot、MyBatis-Plus |
 | 数据 | MySQL 8、Redis（Sorted Set / Pipeline / 游标分页）、Caffeine |
 | 中间件 | RabbitMQ（Fanout Exchange） |
 | 高可用 | 自研熔断器（三状态）、多级缓存回填、DB 兜底 |
@@ -72,7 +72,7 @@ Redis 不可用时熔断器开路，请求直接走 DB 兜底，**避免同步�
 
 ```bash
 # 1. 建库建表
-mysql -uroot -p < sql/schema.sql
+mysql -uroot -p < src/main/resources/sql/schema.sql
 
 # 2. 配置连接信息（敏感项通过环境变量注入）
 #    编辑 src/main/resources/application.yml
@@ -96,7 +96,7 @@ mvn spring-boot:run
 | 点赞 | 1690 QPS | 达标 |
 
 > 环境定语：Windows 8C16G 单机混部（应用 / MySQL / Redis / RabbitMQ / JMeter 同机），以上数字为该环境下实测饱和容量下限。
-> 完整两轮压测报告见 `docs/`。
+> 完整两轮压测分析报告见 `docs/压测报告/`，JMeter 脚本见 `docs/jmeter/`。
 
 ## 已知边界与后续计划
 
@@ -110,17 +110,22 @@ mvn spring-boot:run
 ## 目录结构
 
 ```
-src/main/java/com/ygq/feed/
+src/main/java/com/ygq/feedly/
 ├── controller/          # 发布 / Feed 流 / 关注 / 点赞接口
-├── service/             # FeedTimelineService / LikeService 等核心逻辑
-├── mq/                  # FanoutWorker：粉丝扇出、Pipeline 批量投递
-├── config/              # Redis / RabbitMQ / Caffeine / 熔断器配置
-├── entity/ mapper/      # 实体与数据访问层
-└── vo/ result/          # 出入参、统一响应
+├── service/             # FeedTimelineService / FanoutWorker / LikeService 等核心逻辑
+├── mq/                  # FanoutMessage 消息体
+├── config/              # Redis / RabbitMQ / Druid 配置
+├── common/              # 统一响应 Result / CodeMsg / 业务异常
+├── handler/             # 全局异常处理
+├── entity/ mapper/      # MyBatis-Plus 实体与数据访问层
+└── vo/                  # 出入参对象
 src/main/resources/
 ├── application.yml      # 敏感配置均为环境变量占位符
 └── sql/schema.sql       # 建表脚本
-docs/                    # 两轮压测报告与 JMeter 脚本
+docs/
+├── images/              # 架构图
+├── 压测报告/            # 两轮压测完整分析报告
+└── jmeter/              # JMeter 压测脚本
 ```
 
 ## License
