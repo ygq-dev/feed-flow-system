@@ -96,7 +96,6 @@ mvn spring-boot:run
 | 点赞 | 1690 QPS | 达标 |
 
 > 环境定语：Windows 8C16G 单机混部（应用 / MySQL / Redis / RabbitMQ / JMeter 同机），以上数字为该环境下实测饱和容量下限。
-> 完整两轮压测分析报告见 `docs/压测报告/`，JMeter 脚本见 `docs/jmeter/`。
 
 ## 已知边界与后续计划
 
@@ -124,8 +123,6 @@ src/main/resources/
 └── sql/schema.sql       # 建表脚本
 docs/
 ├── images/              # 架构图
-├── 压测报告/            # 两轮压测完整分析报告
-└── jmeter/              # JMeter 压测脚本
 ```
 
 ## License
